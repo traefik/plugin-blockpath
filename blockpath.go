@@ -1,3 +1,4 @@
+// Package plugin_blockpath a plugin to block a path.
 package plugin_blockpath
 
 import (
