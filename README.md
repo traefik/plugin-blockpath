@@ -1,27 +1,42 @@
 # Block Path
 
-This [Traefik](https://github.com/containous/traefik) plugin is as middleware which sends an HTTP `403 Forbidden` response 
-when the HTTP request path matches one the configured [expressions](https://github.com/google/re2/wiki/Syntax).
+Block Path is a middleware plugin for [Traefik](https://github.com/containous/traefik) which sends an HTTP `403 Forbidden` 
+response when the requested HTTP path matches one the configured [regular expressions](https://github.com/google/re2/wiki/Syntax).
 
 ## Configuration
 
-To configure this plugin you should add its configuration to the Traefik dynamic configuration as explained [here](https://docs.traefik.io/getting-started/configuration-overview/#the-dynamic-configuration).
-The following snippet shows how to configure this plugin with the File provider in TOML and YAML: 
+## Static
 
 ```toml
-# Block all paths starting with /foo
-[http.middlewares]
-  [http.middlewares.block-foo.blockPath]
-    regex = ["^/foo(.*)"]
+[experimental.pilot]
+    token="xxx"
+
+[experimental.plugins.blockpath]
+    modulename = "github.com/containous/plugin-blockpath"
+    version = "v0.1.1"
 ```
 
-```yaml
-# Block all paths containing bar
-http:
-  middlewares:
-    block-bar:
-      plugin:
-        blockpath:
-          regex: 
-            - "bar"
-```
+## Dynamic
+
+To configure the `Block Path` plugin you should create a [middleware](https://docs.traefik.io/middlewares/overview/) in 
+your dynamic configuration as explained [here](https://docs.traefik.io/middlewares/overview/). The following example creates
+and uses the `blockpath` middleware plugin to block all HTTP requests with a path starting with `/foo`. 
+
+```toml
+[http.routers]
+  [http.routers.my-router]
+    rule = "Host(`localhost`)"
+    middlewares = ["block-foo"]
+    service = "my-service"
+
+# Block all paths starting with /foo
+[http.middlewares]
+  [http.middlewares.block-foo.blockpath]
+    regex = ["^/foo(.*)"]
+
+[http.services]
+  [http.services.my-service]
+    [http.services.my-service.loadBalancer]
+      [[http.services.my-service.loadBalancer.servers]]
+        url = "http://127.0.0.1"
+``` 
