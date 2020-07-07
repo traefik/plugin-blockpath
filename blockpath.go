@@ -44,8 +44,10 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 }
 
 func (b *blockPath) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	currentPath := req.URL.EscapedPath()
+
 	for _, re := range b.regexps {
-		if re.MatchString(req.URL.Path) {
+		if re.MatchString(currentPath) {
 			rw.WriteHeader(http.StatusForbidden)
 			return
 		}
