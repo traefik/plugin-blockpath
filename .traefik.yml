@@ -1,0 +1,8 @@
+displayName: Block Path
+summary: Blocks the HTTP requests with a path matching the configured regex.
+type: middleware
+import: github.com/containous/plugin-blockpath
+compatibility: TODO
+testData:
+  Regex:
+    - "^/foo(.*)"
