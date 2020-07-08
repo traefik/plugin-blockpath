@@ -31,7 +31,7 @@ and uses the `blockpath` middleware plugin to block all HTTP requests with a pat
 
 # Block all paths starting with /foo
 [http.middlewares]
-  [http.middlewares.block-foo.blockpath]
+  [http.middlewares.block-foo.plugin.blockpath]
     regex = ["^/foo(.*)"]
 
 [http.services]
@@ -39,4 +39,4 @@ and uses the `blockpath` middleware plugin to block all HTTP requests with a pat
     [http.services.my-service.loadBalancer]
       [[http.services.my-service.loadBalancer.servers]]
         url = "http://127.0.0.1"
-``` 
+```
