@@ -13,7 +13,7 @@ response when the requested HTTP path matches one the configured [regular expres
 
 [experimental.plugins.blockpath]
     modulename = "github.com/containous/plugin-blockpath"
-    version = "v0.1.1"
+    version = "v0.1.2"
 ```
 
 ## Dynamic
