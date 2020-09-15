@@ -1,3 +1,3 @@
-module github.com/containous/plugin-blockpath
+module github.com/traefik/plugin-blockpath
 
 go 1.14
