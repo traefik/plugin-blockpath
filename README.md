@@ -8,12 +8,12 @@ response when the requested HTTP path matches one the configured [regular expres
 ## Static
 
 ```toml
-[experimental.pilot]
+[pilot]
     token="xxx"
 
 [experimental.plugins.blockpath]
     modulename = "github.com/traefik/plugin-blockpath"
-    version = "v0.1.2"
+    version = "v0.2.1"
 ```
 
 ## Dynamic
