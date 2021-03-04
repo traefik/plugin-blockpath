@@ -1,8 +1,8 @@
-# Block Path With Whitelist
+# Block Path
 
 [![Build Status](https://github.com/traefik/plugin-blockpath/workflows/Main/badge.svg?branch=master)](https://github.com/traefik/plugin-blockpath/actions)
 
-Block Path With Whitelist is a middleware plugin for [Traefik](https://github.com/traefik/traefik) which sends an HTTP `403 Forbidden` 
+Block Path is a middleware plugin for [Traefik](https://github.com/traefik/traefik) which sends an HTTP `403 Forbidden` 
 response when the requested HTTP path matches one the configured [regular expressions](https://github.com/google/re2/wiki/Syntax). Users of the plugin can also choose a Whitelist regex array to override the blocklist if required.
 
 ## Configuration
@@ -15,7 +15,7 @@ response when the requested HTTP path matches one the configured [regular expres
 
 [experimental.plugins.blockpath]
     modulename = "github.com/AdrianFletcher/plugin-blockpath-with-whitelist"
-    version = "v0.2.1"
+    version = "v0.2.2"
 ```
 
 ## Dynamic
