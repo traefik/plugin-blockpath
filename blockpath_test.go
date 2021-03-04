@@ -89,9 +89,9 @@ func TestServeHTTP(t *testing.T) {
 		{
 			id:               5,
 			desc:             "should return ok status",
-			regexps:          []string{"^/test(.*)"},
-			regexpsWhitelist: []string{"^/testing.php"},
-			reqPath:          "/testing.php",
+			regexps:          []string{"^/wp-admin(.*)"},
+			regexpsWhitelist: []string{"^/wp-admin/admin-ajax\\.php(.*)"},
+			reqPath:          "/wp-admin/admin-ajax.php",
 			expNextCall:      true,
 			expStatusCode:    http.StatusOK,
 		},
