@@ -45,7 +45,6 @@ func TestNew(t *testing.T) {
 
 func TestServeHTTP(t *testing.T) {
 	tests := []struct {
-		id               int
 		desc             string
 		regexps          []string
 		regexpsWhitelist []string
@@ -54,7 +53,6 @@ func TestServeHTTP(t *testing.T) {
 		expStatusCode    int
 	}{
 		{
-			id:            1,
 			desc:          "Should return forbidden status",
 			regexps:       []string{"/test"},
 			reqPath:       "/test",
@@ -62,7 +60,6 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode: http.StatusForbidden,
 		},
 		{
-			id:            2,
 			desc:          "should return forbidden status",
 			regexps:       []string{"/test", "/toto"},
 			reqPath:       "/toto",
@@ -70,7 +67,6 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode: http.StatusForbidden,
 		},
 		{
-			id:               3,
 			desc:             "should return forbidden status",
 			regexps:          []string{"/test", "/toto"},
 			regexpsWhitelist: []string{"/tests", "/totos"},
@@ -79,7 +75,6 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode:    http.StatusForbidden,
 		},
 		{
-			id:            4,
 			desc:          "should return ok status",
 			regexps:       []string{"/test", "/toto"},
 			reqPath:       "/plop",
@@ -87,7 +82,6 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode: http.StatusOK,
 		},
 		{
-			id:               5,
 			desc:             "should return ok status",
 			regexps:          []string{"^/wp-admin(.*)"},
 			regexpsWhitelist: []string{"^/wp-admin/admin-ajax\\.php(.*)"},
@@ -96,14 +90,12 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode:    http.StatusOK,
 		},
 		{
-			id:            6,
 			desc:          "should return ok status",
 			reqPath:       "/test",
 			expNextCall:   true,
 			expStatusCode: http.StatusOK,
 		},
 		{
-			id:            7,
 			desc:          "should return forbidden status",
 			regexps:       []string{`^/bar(.*)`},
 			reqPath:       "/bar/foo",
@@ -111,7 +103,6 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode: http.StatusForbidden,
 		},
 		{
-			id:            8,
 			desc:          "should return ok status",
 			regexps:       []string{`^/bar(.*)`},
 			reqPath:       "/foo/bar",
@@ -149,7 +140,7 @@ func TestServeHTTP(t *testing.T) {
 			}
 
 			if recorder.Result().StatusCode != test.expStatusCode {
-				t.Errorf("%d - %s: got status code %d, want %d", test.id, test.desc, recorder.Code, test.expStatusCode)
+				t.Errorf("%s: got status code %d, want %d", test.desc, recorder.Code, test.expStatusCode)
 			}
 		})
 	}
