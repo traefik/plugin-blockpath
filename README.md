@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/traefik/plugin-blockpath/workflows/Main/badge.svg?branch=master)](https://github.com/traefik/plugin-blockpath/actions)
 
 Block Path is a middleware plugin for [Traefik](https://github.com/traefik/traefik) which sends an HTTP `403 Forbidden` 
-response when the requested HTTP path matches one the configured [regular expressions](https://github.com/google/re2/wiki/Syntax).
+response when the requested HTTP path matches one the configured [regular expressions](https://github.com/google/re2/wiki/Syntax). Users of the plugin can also choose to whitelist paths that match a configured regular expression.
 
 ## Configuration
 
@@ -14,15 +14,15 @@ response when the requested HTTP path matches one the configured [regular expres
     token="xxx"
 
 [experimental.plugins.blockpath]
-    modulename = "github.com/traefik/plugin-blockpath"
-    version = "v0.2.1"
+    modulename = "github.com/AdrianFletcher/plugin-blockpath-with-whitelist"
+    version = "v0.2.2"
 ```
 
 ## Dynamic
 
 To configure the `Block Path` plugin you should create a [middleware](https://docs.traefik.io/middlewares/overview/) in 
 your dynamic configuration as explained [here](https://docs.traefik.io/middlewares/overview/). The following example creates
-and uses the `blockpath` middleware plugin to block all HTTP requests with a path starting with `/foo`. 
+and uses the `blockpath` middleware plugin to block all HTTP requests with a path starting with `/foo`, but allow a path starting with `/foobar`.
 
 ```toml
 [http.routers]
@@ -35,6 +35,7 @@ and uses the `blockpath` middleware plugin to block all HTTP requests with a pat
 [http.middlewares]
   [http.middlewares.block-foo.plugin.blockpath]
     regex = ["^/foo(.*)"]
+    regexwhitelist = ["^/foobar(.*)"]
 
 [http.services]
   [http.services.my-service]
