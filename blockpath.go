@@ -10,49 +10,55 @@ import (
 
 // Config holds the plugin configuration.
 type Config struct {
-	Regex []string `json:"regex,omitempty"`
+	Regex      []string `json:"regex,omitempty"`
+	StatusCode int
 }
 
 // CreateConfig creates and initializes the plugin configuration.
 func CreateConfig() *Config {
-	return &Config{}
+	return &Config{
+		Regex:      make([]string, 0),
+		StatusCode: http.StatusForbidden,
+	}
 }
 
 type blockPath struct {
-	name    string
-	next    http.Handler
-	regexps []*regexp.Regexp
+	name       string
+	next       http.Handler
+	regexps    []*regexp.Regexp
+	statuscode int
 }
 
 // New creates and returns a plugin instance.
 func New(_ context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 	regexps := make([]*regexp.Regexp, len(config.Regex))
 
-	for i, regex := range config.Regex {
+	for regexIndex, regex := range config.Regex {
 		re, err := regexp.Compile(regex)
 		if err != nil {
 			return nil, fmt.Errorf("error compiling regex %q: %w", regex, err)
 		}
 
-		regexps[i] = re
+		regexps[regexIndex] = re
 	}
 
 	return &blockPath{
-		name:    name,
-		next:    next,
-		regexps: regexps,
+		name:       name,
+		next:       next,
+		regexps:    regexps,
+		statuscode: config.StatusCode,
 	}, nil
 }
 
-func (b *blockPath) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (b *blockPath) ServeHTTP(responseWriter http.ResponseWriter, req *http.Request) {
 	currentPath := req.URL.EscapedPath()
 
 	for _, re := range b.regexps {
 		if re.MatchString(currentPath) {
-			rw.WriteHeader(http.StatusForbidden)
+			responseWriter.WriteHeader(b.statuscode)
 			return
 		}
 	}
 
-	b.next.ServeHTTP(rw, req)
+	b.next.ServeHTTP(responseWriter, req)
 }

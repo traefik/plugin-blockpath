@@ -2,7 +2,6 @@ package plugin_blockpath
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,10 +28,12 @@ func TestNew(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
 			cfg := &Config{
-				Regex: test.regexps,
+				Regex:      test.regexps,
+				StatusCode: http.StatusForbidden,
 			}
 
-			if _, err := New(context.Background(), nil, cfg, "name"); test.expErr && err == nil {
+			_, err := New(context.Background(), nil, cfg, "name")
+			if test.expErr && err == nil {
 				t.Errorf("expected error on bad regexp format")
 			}
 		})
@@ -44,6 +45,7 @@ func TestServeHTTP(t *testing.T) {
 		desc          string
 		regexps       []string
 		reqPath       string
+		statusCode    int
 		expNextCall   bool
 		expStatusCode int
 	}{
@@ -70,6 +72,7 @@ func TestServeHTTP(t *testing.T) {
 		},
 		{
 			desc:          "should return ok status",
+			regexps:       []string{},
 			reqPath:       "/test",
 			expNextCall:   true,
 			expStatusCode: http.StatusOK,
@@ -82,9 +85,25 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode: http.StatusForbidden,
 		},
 		{
-			desc:          "should return forbidden status",
+			desc:          "should return ok status",
 			regexps:       []string{`^/bar(.*)`},
 			reqPath:       "/foo/bar",
+			expNextCall:   true,
+			expStatusCode: http.StatusOK,
+		},
+		{
+			desc:          "should return not found status",
+			regexps:       []string{`^/bar(.*)`},
+			reqPath:       "/bar/foo",
+			statusCode:    http.StatusNotFound,
+			expNextCall:   false,
+			expStatusCode: http.StatusNotFound,
+		},
+		{
+			desc:          "should return ok status",
+			regexps:       []string{"/test", "/toto"},
+			reqPath:       "/plop",
+			statusCode:    http.StatusNotFound,
 			expNextCall:   true,
 			expStatusCode: http.StatusOK,
 		},
@@ -92,12 +111,15 @@ func TestServeHTTP(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			cfg := &Config{
-				Regex: test.regexps,
+			cfg := CreateConfig()
+
+			cfg.Regex = test.regexps
+			if test.statusCode != 0 {
+				cfg.StatusCode = test.statusCode
 			}
 
 			nextCall := false
-			next := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+			next := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 				nextCall = true
 			})
 
@@ -108,8 +130,8 @@ func TestServeHTTP(t *testing.T) {
 
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("http://localhost%s", test.reqPath)
-			req := httptest.NewRequest(http.MethodGet, url, nil)
+			url := "http://localhost" + test.reqPath
+			req := httptest.NewRequest(http.MethodGet, url, http.NoBody)
 
 			handler.ServeHTTP(recorder, req)
 

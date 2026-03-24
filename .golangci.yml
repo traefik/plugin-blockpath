@@ -1,86 +1,85 @@
-run:
-  timeout: 5m
-  skip-files: [ ]
-  skip-dirs: [ ]
-
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - fieldalignment
-  gocyclo:
-    min-complexity: 15
-  maligned:
-    suggest-new: true
-  goconst:
-    min-len: 5
-    min-occurrences: 3
-  misspell:
-    locale: US
-  funlen:
-    lines: -1
-    statements: 40
-  godox:
-    keywords:
-      - FIXME
-  gofumpt:
-    extra-rules: true
-  depguard:
-    list-type: blacklist
-    include-go-root: false
-    packages:
-      - github.com/sirupsen/logrus
-      - github.com/pkg/errors
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - style
-      - performance
-    disabled-checks:
-      - sloppyReassign
-      - rangeValCopy
-      - octalLiteral
-      - paramTypeCombine # already handle by gofumpt.extra-rules
-    settings:
-      hugeParam:
-        sizeThreshold: 100
-
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
-    - maligned # deprecated
-    - interfacer # deprecated
-    - scopelint # deprecated
-    - golint # deprecated
-    - sqlclosecheck # not relevant (SQL)
-    - rowserrcheck # not relevant (SQL)
-    - cyclop # duplicate of gocyclo
-    - lll
-    - dupl
-    - wsl
-    - nlreturn
-    - gomnd
-    - goerr113
-    - wrapcheck
     - bodyclose
+    - cyclop
+    - dupl
+    - err113
     - exhaustive
-    - exhaustivestruct
-    - testpackage
-    - tparallel
+    - exhaustruct
+    - forcetypeassert
+    - lll
+    - mnd
+    - nlreturn
+    - noctx
     - paralleltest
     - prealloc
-    - ifshort
-    - forcetypeassert
-    - noctx
-
+    - rowserrcheck
+    - sqlclosecheck
+    - testpackage
+    - tparallel
+    - wrapcheck
+    - wsl
+  settings:
+    funlen:
+      lines: -1
+      statements: 40
+    goconst:
+      min-len: 5
+      min-occurrences: 3
+    gocritic:
+      disabled-checks:
+        - sloppyReassign
+        - rangeValCopy
+        - octalLiteral
+        - paramTypeCombine
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+      settings:
+        hugeParam:
+          sizeThreshold: 100
+    gocyclo:
+      min-complexity: 15
+    godox:
+      keywords:
+        - FIXME
+    govet:
+      disable:
+        - fieldalignment
+      enable-all: true
+    misspell:
+      locale: US
+  exclusions:
+    generated: lax
+    rules:
+      - linters:
+          - funlen
+        path: .*_test.go
+      - path: (.+)\.go$
+        text: don't use an underscore in package name
+      - path: (.+)\.go$
+        text: 'ST1003: should not use underscores in package names'
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  exclude-use-default: false
-  max-per-linter: 0
   max-same-issues: 0
-  exclude:
-    - "don't use an underscore in package name"
-    - "ST1003: should not use underscores in package names"
-  exclude-rules:
-    - path: .*_test.go
-      linters:
-        - funlen
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gofumpt:
+      extra-rules: true
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
