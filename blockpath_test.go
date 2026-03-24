@@ -72,7 +72,6 @@ func TestServeHTTP(t *testing.T) {
 		},
 		{
 			desc:          "should return ok status",
-			regexps:       []string{},
 			reqPath:       "/test",
 			expNextCall:   true,
 			expStatusCode: http.StatusOK,
@@ -92,7 +91,7 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode: http.StatusOK,
 		},
 		{
-			desc:          "should return not found status",
+			desc:          "should return defined statuscode not found",
 			regexps:       []string{`^/bar(.*)`},
 			reqPath:       "/bar/foo",
 			statusCode:    http.StatusNotFound,
@@ -100,10 +99,17 @@ func TestServeHTTP(t *testing.T) {
 			expStatusCode: http.StatusNotFound,
 		},
 		{
-			desc:          "should return ok status",
+			desc:          "should return ok status with not matching and statuscode set",
 			regexps:       []string{"/test", "/toto"},
 			reqPath:       "/plop",
 			statusCode:    http.StatusNotFound,
+			expNextCall:   true,
+			expStatusCode: http.StatusOK,
+		},
+		{
+			desc:          "should return ok status with no regex and statuscode set",
+			reqPath:       "/test",
+			statusCode:    http.StatusForbidden,
 			expNextCall:   true,
 			expStatusCode: http.StatusOK,
 		},
