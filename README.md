@@ -2,8 +2,9 @@
 
 [![Build Status](https://github.com/traefik/plugin-blockpath/workflows/Main/badge.svg?branch=master)](https://github.com/traefik/plugin-blockpath/actions)
 
-Block Path is a middleware plugin for [Traefik](https://github.com/traefik/traefik) which sends an HTTP `403 Forbidden` 
-response when the requested HTTP path matches one the configured [regular expressions](https://github.com/google/re2/wiki/Syntax).
+Block Path is a middleware plugin for [Traefik](https://github.com/traefik/traefik) which blocks requests
+with a configurable status code (default `403 Forbidden`) when the requested HTTP path matches one of the
+configured [regular expressions](https://github.com/google/re2/wiki/Syntax).
 
 ## Configuration
 
@@ -35,6 +36,7 @@ and uses the `blockpath` middleware plugin to block all HTTP requests with a pat
 [http.middlewares]
   [http.middlewares.block-foo.plugin.blockpath]
     regex = ["^/foo(.*)"]
+    code = 404 # optional, responds with code 404 instead of 403
 
 [http.services]
   [http.services.my-service]

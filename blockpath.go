@@ -11,6 +11,7 @@ import (
 // Config holds the plugin configuration.
 type Config struct {
 	Regex []string `json:"regex,omitempty"`
+	Code  *int     `json:"code,omitempty"` // Optional: Status code to respond with, defaults to 403 Forbidden
 }
 
 // CreateConfig creates and initializes the plugin configuration.
@@ -22,6 +23,7 @@ type blockPath struct {
 	name    string
 	next    http.Handler
 	regexps []*regexp.Regexp
+	code    int
 }
 
 // New creates and returns a plugin instance.
@@ -37,10 +39,16 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 		regexps[i] = re
 	}
 
+	code := http.StatusForbidden
+	if config.Code != nil {
+		code = *config.Code
+	}
+
 	return &blockPath{
 		name:    name,
 		next:    next,
 		regexps: regexps,
+		code:    code,
 	}, nil
 }
 
@@ -49,7 +57,7 @@ func (b *blockPath) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 
 	for _, re := range b.regexps {
 		if re.MatchString(currentPath) {
-			rw.WriteHeader(http.StatusForbidden)
+			rw.WriteHeader(b.code)
 			return
 		}
 	}

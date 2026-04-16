@@ -12,6 +12,7 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		desc    string
 		regexps []string
+		code    *int
 		expErr  bool
 	}{
 		{
@@ -40,9 +41,12 @@ func TestNew(t *testing.T) {
 }
 
 func TestServeHTTP(t *testing.T) {
+	customCode := http.StatusNotFound
+
 	tests := []struct {
 		desc          string
 		regexps       []string
+		code          *int
 		reqPath       string
 		expNextCall   bool
 		expStatusCode int
@@ -88,12 +92,29 @@ func TestServeHTTP(t *testing.T) {
 			expNextCall:   true,
 			expStatusCode: http.StatusOK,
 		},
+		{
+			desc:          "custom status code (unmatched)",
+			regexps:       []string{"^/api/woof"},
+			code:          &customCode,
+			reqPath:       "/foo/bar",
+			expNextCall:   true,
+			expStatusCode: http.StatusOK,
+		},
+		{
+			desc:          "custom status code (matched)",
+			regexps:       []string{"^/api/woof"},
+			code:          &customCode,
+			reqPath:       "/api/woof",
+			expNextCall:   false,
+			expStatusCode: customCode,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
 			cfg := &Config{
 				Regex: test.regexps,
+				Code:  test.code,
 			}
 
 			nextCall := false
