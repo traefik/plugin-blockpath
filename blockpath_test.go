@@ -47,6 +47,7 @@ func TestServeHTTP(t *testing.T) {
 		desc          string
 		regexps       []string
 		code          *int
+		includeQuery  bool
 		reqPath       string
 		expNextCall   bool
 		expStatusCode int
@@ -108,13 +109,38 @@ func TestServeHTTP(t *testing.T) {
 			expNextCall:   false,
 			expStatusCode: customCode,
 		},
+		{
+			desc:          "include query (unmatched)",
+			regexps:       []string{"^/api/woof$"},
+			includeQuery:  true,
+			reqPath:       "/api/woof?rest_route=/batch/v1",
+			expNextCall:   true,
+			expStatusCode: http.StatusOK,
+		},
+		{
+			desc:          "include query (matched)",
+			regexps:       []string{".*?rest_route=/batch/v1"},
+			includeQuery:  true,
+			reqPath:       "/api/woof?rest_route=/batch/v1",
+			expNextCall:   false,
+			expStatusCode: http.StatusForbidden,
+		},
+		{
+			desc:          "include query (? not included in test without params)",
+			regexps:       []string{"^/api/woof\\?"},
+			includeQuery:  true,
+			reqPath:       "/api/woof?",
+			expNextCall:   true,
+			expStatusCode: http.StatusOK,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
 			cfg := &Config{
-				Regex: test.regexps,
-				Code:  test.code,
+				Regex:        test.regexps,
+				Code:         test.code,
+				IncludeQuery: test.includeQuery,
 			}
 
 			nextCall := false

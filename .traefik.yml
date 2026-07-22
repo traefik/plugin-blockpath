@@ -6,3 +6,5 @@ compatibility: TODO
 testData:
   Regex:
     - "^/foo(.*)"
+  code: 403
+  includeQuery: false

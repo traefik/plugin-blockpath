@@ -21,9 +21,9 @@ configured [regular expressions](https://github.com/google/re2/wiki/Syntax).
 
 ## Dynamic
 
-To configure the `Block Path` plugin you should create a [middleware](https://docs.traefik.io/middlewares/overview/) in 
+To configure the `Block Path` plugin you should create a [middleware](https://docs.traefik.io/middlewares/overview/) in
 your dynamic configuration as explained [here](https://docs.traefik.io/middlewares/overview/). The following example creates
-and uses the `blockpath` middleware plugin to block all HTTP requests with a path starting with `/foo`. 
+and uses the `blockpath` middleware plugin to block all HTTP requests with a path starting with `/foo`.
 
 ```toml
 [http.routers]
@@ -37,6 +37,7 @@ and uses the `blockpath` middleware plugin to block all HTTP requests with a pat
   [http.middlewares.block-foo.plugin.blockpath]
     regex = ["^/foo(.*)"]
     code = 404 # optional, responds with code 404 instead of 403
+    include-query = true # optional and off by default, wether to include query in regex test
 
 [http.services]
   [http.services.my-service]
